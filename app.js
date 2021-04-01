@@ -2,14 +2,17 @@
 const url = 'http://ec2-35-181-5-201.eu-west-3.compute.amazonaws.com:8080/list-products/'
 const idTeam = 'antelopes' // CHANGEME
 
-retreiveAllProductsFromServer()
+retreiveAllProductsFromServer();
+
 
 //Product Constructor
 class Product {
-  constructor( title, price, year) {
+  constructor(id, title, price, year) {
+    this.id = id;
     this.title = title;
     this.price = price;
     this.year = year;
+    
   }
 }
 
@@ -25,7 +28,7 @@ class UI {
       <h5><strong>${product.title}</strong></h5>
       <strong>Price</strong>: ${product.price}€
       <strong>Year</strong>: ${product.year}
-      <a href="#" onclick="UI.deleteProduct(event)" class="dlt btn btn-danger ml-5" name="delete">Delete</a>
+      <a href="#" onclick="UI.deleteProduct(event)" id="${product.id}" class="dlt btn btn-danger ml-5" name="delete">Delete</a>
       </div>
       </div>
       `;
@@ -39,7 +42,10 @@ class UI {
   static deleteProduct(event) {
     console.log("event", event)
     event.target.closest("div.card.text-center.mb-4").remove();
+    console.log("dw"+event.target.id)
+    deleteIdProduct(event.target.id);
     UI.showMessage("Product removed successfully", "danger");
+    
   }
 
   static showMessage(message, cssClass) {
@@ -97,7 +103,7 @@ document.getElementById("product-form").addEventListener("submit",  e => {
 
 
 function postData(opts) {
-  fetch('http://http://ec2-35-181-5-201.eu-west-3.compute.amazonaws.com:8080/add-product/antelopes', {
+  fetch('http://ec2-35-181-5-201.eu-west-3.compute.amazonaws.com:8080/add-product/antelopes', {
     method: "POST",
     body: JSON.stringify(opts),
     headers: {
@@ -122,4 +128,16 @@ function retreiveAllProductsFromServer() {
     }
   });
   
+}
+
+
+function deleteIdProduct(id){
+  console.log(id);
+  const urlDelete = `http://ec2-35-181-5-201.eu-west-3.compute.amazonaws.com:8080/delete-product/antelopes/${id}`;
+ console.log(urlDelete);
+  fetch(urlDelete, {
+      method: 'DELETE'
+  })
+  .then(res => res.json())
+  .then(res => console.log(res));
 }
