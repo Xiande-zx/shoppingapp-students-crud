@@ -1,11 +1,13 @@
 // API Url
-const url = 'http://ec2-35-181-5-201.eu-west-3.compute.amazonaws.com:8080'
-const idTeam = 'test' // CHANGEME
+const url = 'http://ec2-35-181-5-201.eu-west-3.compute.amazonaws.com:8080/list-products/'
+const idTeam = 'antelopes' // CHANGEME
+
+retreiveAllProductsFromServer()
 
 //Product Constructor
 class Product {
-  constructor(name, price, year) {
-    this.name = name;
+  constructor( title, price, year) {
+    this.title = title;
     this.price = price;
     this.year = year;
   }
@@ -20,7 +22,7 @@ class UI {
     element.innerHTML = `
       <div class="card text-center mb-4">
       <div class="card-body">
-      <h5><strong>${product.name}</strong></h5>
+      <h5><strong>${product.title}</strong></h5>
       <strong>Price</strong>: ${product.price}€
       <strong>Year</strong>: ${product.year}
       <a href="#" onclick="UI.deleteProduct(event)" class="dlt btn btn-danger ml-5" name="delete">Delete</a>
@@ -57,24 +59,31 @@ class UI {
       document.querySelector(".alert").remove();
     }, 2000);
   }
-
-  static retreiveAllProductsFromServer() {
-    fetch(`CHANGAME`, {
-      method: 'GET', // So, we can specify HTTP Methods here. Uh, interesting.
-      headers: { 'Content-Type': 'application/json' }, // Type of data to retrieve. 
-      mode: 'cors', // What is CORS?? https://developer.mozilla.org/es/docs/Web/HTTP/CORS 
-    })
-  }
 }
 
-//DOM Events
+
+
+document.getElementById("product-form").addEventListener("submit", e => {
+    const name = document.getElementById("product-name").value
+    price = document.getElementById("product-price").value
+    var age = document.getElementById("product-year").value
+
+    const product = new Product(name, price, age);
+
+    postData(product)
+
+    UI.addProduct(product);
+    UI.resetForm();
+    UI.showMessage("Product added successfully", "success");
+  
+    e.preventDefault();
+  });
+
+
 document.getElementById("product-form").addEventListener("submit",  e => {
-  const name = document.getElementById("product-name").value
+  /*const name = document.getElementById("product-name").value
   price = document.getElementById("product-price").value
   year = document.getElementById("product-year").value
-
-
-
 
   //Save product
   const product = new Product(name, price, year);
@@ -82,6 +91,35 @@ document.getElementById("product-form").addEventListener("submit",  e => {
   UI.addProduct(product);
   UI.resetForm();
   UI.showMessage("Product added successfully", "success");
-
+*/
   e.preventDefault();
 });
+
+
+function postData(opts) {
+  fetch('http://http://ec2-35-181-5-201.eu-west-3.compute.amazonaws.com:8080/add-product/antelopes', {
+    method: "POST",
+    body: JSON.stringify(opts),
+    headers: {
+        "Content-type": "application/json; charset=UTF-8"
+    }
+})
+.then(response => response.json())
+.then(json => console.log(json));
+}
+
+
+function retreiveAllProductsFromServer() {
+    fetch(url+idTeam)
+  .then(function(response) {
+    return response.json();
+  })
+  .then(function(myJson) {
+    for(var i = 0; i< myJson.length; i++){
+      if(myJson[i].year <= 2021){
+       UI.addProduct(myJson[i])
+      }
+    }
+  });
+  
+}
